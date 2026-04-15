@@ -37,16 +37,18 @@
 - **Hardware‑aware**: Tensor Core programming, Triton, CUTLASS, roofline model
 
 ## 🔗 **GitHub Status**
-- **Latest commit**: `dfce249` (Week 4 enhancements)
+- **Latest commit**: `3a65272` (Started implementing `lab2_1_kv_caching.ipynb`)
+- **Previous**: `dfce249` (Week 4 enhancements)
 - **Repository**: https://github.com/axie22/llm‑inference‑engineering
 - **Week 2 files**: https://github.com/axie22/llm‑inference‑engineering/tree/main/week2
 - **Week 3 files**: https://github.com/axie22/llm‑inference‑engineering/tree/main/week3
 - **Week 4 files**: https://github.com/axie22/llm‑inference‑engineering/tree/main/week4
 
 ## 🚀 **Next Steps**
-1. **Start implementation** – Open scaffolded labs and fill TODOs (begin with `lab2_1_kv_caching.ipynb`)
-2. **Request refinements** – Energy efficiency, formal verification, multi‑modal sections
-3. **Enhance Week 5** – Efficient training & scaling with same PhD treatment
+1. **Continue implementation** – `lab2_1_kv_caching.ipynb` has StandardKVCache implemented; finish PagedKVCache and advanced strategies
+2. **Move to other labs** – `lab2_2_flashattention.ipynb`, `lab2_3_batch_optimization.ipynb`
+3. **Request refinements** – Energy efficiency, formal verification, multi‑modal sections
+4. **Enhance Week 5** – Efficient training & scaling with same PhD treatment
 
 ---
 *Enhanced by OpenClaw assistant*
