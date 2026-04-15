@@ -45,4 +45,10 @@ Enhanced Week 2 materials with modern reading material, graphics, and comprehens
 - Modern references point to 2024‑2025 papers and blog posts.
 - Dependencies assume a GPU environment; CPU fallbacks are provided where possible.
 
+## PhD‑Level Enhancement (Additional)
+- Created `README_PHD.md` with graduate‑level depth, theoretical derivations, and research‑frontier coverage.
+- Added sections: **Theoretical Foundations**, **Systems Perspective**, **Advanced Implementation Details**, **Research Frontiers**, **Open Problems**.
+- Extended reference list with recent preprints (2024‑2026) and systems papers (OSDI, MLSys, ASPLOS).
+- Incorporated PhD‑level lab extensions (formal verification, queueing‑theoretic modeling, I/O‑complexity analysis).
+
 Enjoy Week 2!

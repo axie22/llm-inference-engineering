@@ -407,6 +407,9 @@ You've successfully completed Week 2 if you can:
 **Difficulty Level:** ⭐⭐⭐☆☆ (Intermediate optimization)  
 **Next Week:** Advanced Sampling & Decoding
 
+**🎓 PhD‑Level Version Available**  
+For graduate‑level depth, theoretical derivations, and research‑frontier coverage, see [`README_PHD.md`](README_PHD.md).
+
 ---
 *Last Updated: April 2026*  
 *Enhanced with modern reading material and graphics*
