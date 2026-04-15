@@ -4,8 +4,12 @@
 
 ### **Week 2 – Core Optimization Techniques**
 - PhD‑level lecture: `week2/README_PHD.md`
+- **`lab2_1_kv_caching.ipynb` – Implemented**:
+  - `StandardKVCache` with update/get methods
+  - `PagedKVCache` with paged memory allocation
+  - Benchmarking suite for performance comparison
+  - Sliding‑window cache stub (advanced strategy)
 - Scaffolded labs with TODOs:
-  - `lab2_1_kv_caching.ipynb` – Standard & PagedAttention KV caching
   - `lab2_2_flashattention.ipynb` – FlashAttention‑2 implementation
   - `lab2_3_batch_optimization.ipynb` – Dynamic/continuous batching
 - Updated main `README.md` with modern references + link to PhD version
@@ -37,16 +41,16 @@
 - **Hardware‑aware**: Tensor Core programming, Triton, CUTLASS, roofline model
 
 ## 🔗 **GitHub Status**
-- **Latest commit**: `3a65272` (Started implementing `lab2_1_kv_caching.ipynb`)
-- **Previous**: `dfce249` (Week 4 enhancements)
+- **Latest commit**: `0189da3` (Completed `lab2_1_kv_caching.ipynb` implementation)
+- **Previous**: `3a65272` (Started implementation)
 - **Repository**: https://github.com/axie22/llm‑inference‑engineering
 - **Week 2 files**: https://github.com/axie22/llm‑inference‑engineering/tree/main/week2
 - **Week 3 files**: https://github.com/axie22/llm‑inference‑engineering/tree/main/week3
 - **Week 4 files**: https://github.com/axie22/llm‑inference‑engineering/tree/main/week4
 
 ## 🚀 **Next Steps**
-1. **Continue implementation** – `lab2_1_kv_caching.ipynb` has StandardKVCache implemented; finish PagedKVCache and advanced strategies
-2. **Move to other labs** – `lab2_2_flashattention.ipynb`, `lab2_3_batch_optimization.ipynb`
+1. **Run and verify** `lab2_1_kv_caching.ipynb` – all core functionality implemented
+2. **Move to FlashAttention** – start `lab2_2_flashattention.ipynb` implementation
 3. **Request refinements** – Energy efficiency, formal verification, multi‑modal sections
 4. **Enhance Week 5** – Efficient training & scaling with same PhD treatment
 
