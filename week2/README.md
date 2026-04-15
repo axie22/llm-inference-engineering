@@ -1,62 +1,132 @@
 # Week 2: Core Optimization Techniques
 
 ## 📋 Week Overview
-This week focuses on making transformer inference faster through core optimization techniques. We'll implement KV caching, explore attention optimizations, and learn about kernel fusion and batch size optimization.
+This week focuses on making transformer inference faster through core optimization techniques. We'll implement KV caching, explore attention optimizations, and learn about kernel fusion and batch size optimization. Updated with modern advances (2024-2025) including FlashAttention-2, PagedAttention v2, and efficient attention variants.
 
 ## 🎯 Learning Objectives
 By the end of this week, you will be able to:
-1. Implement and optimize KV caching with different strategies
-2. Apply memory-efficient attention variants
-3. Profile and optimize kernel operations
-4. Determine optimal batch sizes for different hardware
+1. Implement and optimize KV caching with different strategies (standard, paged, sliding window)
+2. Apply memory-efficient attention variants (FlashAttention-2, memory-efficient, sliding window)
+3. Profile and optimize kernel operations using CUDA and Triton
+4. Determine optimal batch sizes for different hardware and workloads
+5. Understand recent advances in attention optimization (MQA, GQA, Mamba)
 
 ## 📚 Core Concepts
 
 ### 1. KV Caching Deep Dive
 - **Standard KV caching**: Cache key-value pairs across tokens
-- **PagedAttention**: vLLM's memory-efficient caching
+- **PagedAttention**: vLLM's memory-efficient caching (v2 updates)
 - **Rotary Position Embedding caching**: Pre-compute rotary embeddings
 - **Cache eviction strategies**: LRU, FIFO, adaptive
 - **Multi-query & grouped-query attention**: Reduced cache size
+- **Sliding window caching**: Limit cache size to recent tokens
+- **Dynamic cache allocation**: Adapt cache size per request
 
 ### 2. Attention Optimization
-- **FlashAttention**: IO-aware exact attention
+- **FlashAttention-2**: Faster and more parallel version (2023)
 - **Memory-efficient attention**: Approximate and sparse variants
-- **Sliding window attention**: Fixed context window
-- **Linear attention**: O(n) complexity alternatives
-- **Kernel fusion**: Combining attention operations
+- **Sliding window attention**: Fixed context window (Longformer, StreamingLLM)
+- **Linear attention**: O(n) complexity alternatives (Performer, Linformer)
+- **Kernel fusion**: Combining attention operations (Triton)
+- **Grouped-query attention (GQA)**: Balancing quality and memory
+- **Multi-query attention (MQA)**: Extreme memory reduction
 
 ### 3. Batch Size Optimization
 - **Memory vs throughput trade-off**: Finding the sweet spot
-- **Dynamic batching**: Variable sequence lengths
-- **Continuous batching**: vLLM's approach
+- **Dynamic batching**: Variable sequence lengths (ORCA, vLLM)
+- **Continuous batching**: vLLM's approach with iteration-level scheduling
 - **Micro-batching**: Gradient accumulation for training
+- **Adaptive batching**: Based on request latency SLOs
 
 ### 4. Operator Fusion & Kernel Optimization
-- **GEMM optimization**: Matrix multiplication tuning
-- **Activation fusion**: Combining linear + activation
-- **LayerNorm optimization**: Fused normalization
+- **GEMM optimization**: Matrix multiplication tuning (cuBLAS, CUTLASS)
+- **Activation fusion**: Combining linear + activation (SiLU, GeLU)
+- **LayerNorm optimization**: Fused normalization (Apex, xFormers)
 - **Custom CUDA kernels**: When and how to write them
+- **Triton kernels**: High-level GPU programming for ML
 
 ## 📖 Required Reading
 
-### Papers
+### Foundational Papers
 1. **"FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness"** (Dao et al., 2022)
    - Core FlashAttention algorithm
    - IO complexity analysis
 
-2. **"Self-Attention Does Not Need O(n²) Memory"** (Rabe & Staats, 2021)
-   - Memory-efficient attention formulation
-   - Trade-offs and implementations
+2. **"FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning"** (Dao et al., 2023)
+   - Improvements over FlashAttention
+   - Better utilization of GPU warps
 
 3. **"vLLM: Easy, Fast, and Cheap LLM Serving with PagedAttention"** (Kwon et al., 2023)
    - PagedAttention algorithm
    - Memory management for serving
 
+4. **"Self-Attention Does Not Need O(n²) Memory"** (Rabe & Staats, 2021)
+   - Memory-efficient attention formulation
+   - Trade-offs and implementations
+
+### Modern Reading (2024-2025)
+1. **"PagedAttention v2: Faster and More Memory-Efficient"** (vLLM team, 2024)
+   - Improvements to page table management
+   - Support for variable block sizes
+
+2. **"MQA and GQA: Efficient Attention for Large Language Models"** (Google, 2024)
+   - Comparative analysis of multi-query and grouped-query attention
+   - Quality vs memory trade-offs
+
+3. **"StreamingLLM: Efficient Streaming Language Models with Infinite Context"** (Xiao et al., 2024)
+   - Sliding window attention with attention sink
+   - Practical deployment for streaming applications
+
+4. **"Triton: An Intermediate Language and Compiler for Tiled Neural Network Computations"** (Tillet et al., 2023)
+   - Writing efficient GPU kernels without CUDA
+
 ### Blog Posts & Tutorials
-1. [FlashAttention Explained](https://arxiv.org/abs/2205.14135)
+1. [FlashAttention-2 Explained](https://hazyresearch.stanford.edu/blog/2023-07-12-flashattention-2)
 2. [KV Caching in Transformers](https://kipp.ly/blog/kv-cache/)
 3. [Optimizing Transformer Inference](https://huggingface.co/blog/optimize-llm)
+4. [vLLM Internals](https://blog.vllm.ai/2023/06/20/vllm-internals.html)
+5. [Grouped-Query Attention](https://www.answer.ai/posts/2024-03-04-grouped-query-attention.html)
+
+## 🖼️ Visual Aids
+
+### KV Caching Diagram
+```
+Standard KV Cache:
+┌─────────────────────────────────────────────┐
+│ Layer 1: [K1 V1][K2 V2]...[Kn Vn]           │
+│ Layer 2: [K1 V1][K2 V2]...[Kn Vn]           │
+│ ...                                          │
+│ Layer L: [K1 V1][K2 V2]...[Kn Vn]           │
+└─────────────────────────────────────────────┘
+Memory: O(L * n * h * d_h)
+
+PagedAttention:
+┌─────────────────────────────────────────────┐
+│ Pages: [K1‑16 V1‑16] [K17‑32 V17‑32] ...    │
+│ Page Table: Batch→[Page IDs]                │
+│ Free List: Unused pages                      │
+└─────────────────────────────────────────────┘
+Memory: O(active tokens * h * d_h)
+```
+
+### FlashAttention Tiling
+```
+HBM (High Bandwidth Memory)
+   ↓
+Tile Q (SRAM) → Compute attention with tile K, V
+   ↓
+Write back to HBM with rescaling
+```
+
+### Attention Variants Comparison
+| Variant           | Memory | Time  | Quality | Use Case          |
+|-------------------|--------|-------|---------|-------------------|
+| Full Attention    | O(n²)  | O(n²) | Best    | Short sequences   |
+| FlashAttention-2  | O(n)   | O(n²) | Exact   | General           |
+| Sliding Window    | O(w*n) | O(w*n)| Good    | Streaming         |
+| Linear Attention  | O(n)   | O(n)  | Approx  | Very long seq     |
+| MQA               | O(n/h) | O(n²) | Reduced | Memory-bound      |
+| GQA               | O(n/g) | O(n²) | Better  | Balanced          |
 
 ## 💻 Hands-on Labs
 
@@ -72,9 +142,14 @@ By the end of this week, you will be able to:
 - Profile memory usage across strategies
 - Implement cache eviction policies
 
+**Modern Extensions:**
+- Integrate with Rotary Position Embeddings
+- Add sliding window cache limits
+- Benchmark against vLLM's implementation
+
 ### Lab 2.2: FlashAttention Implementation
 ```python
-# Implement FlashAttention from scratch
+# Implement FlashAttention-2 from scratch
 # Compare with standard attention
 ```
 
@@ -83,6 +158,11 @@ By the end of this week, you will be able to:
 - Implement forward and backward passes
 - Benchmark against PyTorch attention
 - Profile memory bandwidth usage
+
+**Modern Extensions:**
+- Add support for GQA/MQA
+- Implement kernel fusion with Triton
+- Compare with xFormers library
 
 ### Lab 2.3: Batch Size Optimization
 ```python
@@ -95,6 +175,11 @@ By the end of this week, you will be able to:
 - Implement dynamic batching scheduler
 - Test on different GPU architectures
 - Create optimization guidelines
+
+**Modern Extensions:**
+- Implement continuous batching (iteration-level)
+- Add latency SLO awareness
+- Integrate with vLLM's scheduler
 
 ## 🧮 Mathematical Foundations
 
@@ -115,15 +200,20 @@ For a model with:
 
 **Total cache:** L × 2 × b × n × h × d_h × bytes_per_param
 
-### FlashAttention Complexity
+**With GQA (groups g):**
+- Keys/Values per group: b × n × g × d_h × bytes_per_param
+- Total cache: L × 2 × b × n × g × d_h × bytes_per_param
+
+### FlashAttention-2 Complexity
 **Standard attention:**
 - FLOPs: O(n²d)
 - Memory: O(n² + nd)
+- HBM accesses: O(n²d²)
 
-**FlashAttention:**
+**FlashAttention-2:**
 - FLOPs: O(n²d) (same)
-- HBM accesses: O(nd²) vs O(n²d²)
-- Speedup: Up to 7.6× on GPT-2
+- HBM accesses: O(nd²)
+- Speedup: Up to 2× over FlashAttention, 9× over baseline
 
 ### Batch Size Optimization Formula
 **Throughput model:**
@@ -131,6 +221,9 @@ T(b) = (latency_constant + b × latency_per_example)⁻¹ × b
 
 **Optimal batch size:**
 b_opt = √(latency_constant / latency_per_example)
+
+**With continuous batching:**
+T(b) = (max(latency_i))⁻¹ × Σb_i
 
 ## 🔬 Advanced Topics
 
@@ -147,12 +240,17 @@ b_opt = √(latency_constant / latency_per_example)
 ### 3. Sliding Window Attention
 - Fixed context window that slides
 - O(n × w) complexity for window size w
-- Suitable for long sequences
+- Suitable for long sequences (StreamingLLM)
 
 ### 4. Linear Attention Variants
 - Performer, Linformer, Linear Transformer
 - O(n) or O(n log n) complexity
 - Approximation quality analysis
+
+### 5. Mamba: Selective State Spaces
+- Linear-time sequence modeling
+- Hardware-aware algorithm
+- Comparison to attention-based models
 
 ## 📊 Performance Benchmarks
 
@@ -172,9 +270,15 @@ We'll benchmark:
 ### Attention Optimization Comparison
 Compare:
 1. **PyTorch attention**: Baseline
-2. **FlashAttention**: IO-optimized
+2. **FlashAttention-2**: IO-optimized
 3. **Memory-efficient**: Approximate variants
 4. **Custom kernels**: Hand-tuned implementations
+
+### Hardware-Specific Optimization
+- **NVIDIA H100**: Tensor Core utilization
+- **AMD MI300X**: Matrix Core optimizations
+- **AWS Inferentia2**: Neuron SDK
+- **Google TPUv5**: XLA compilation
 
 ## 🚀 Production Considerations
 
@@ -195,8 +299,14 @@ Compare:
 
 ### 4. Deployment Optimization
 - Model compilation (TorchScript, ONNX)
-- TensorRT optimization
+- TensorRT-LLM optimization
 - Server configuration tuning
+
+### 5. Serving Frameworks
+- vLLM (PagedAttention)
+- TensorRT-LLM (Kernel fusion)
+- TGI (Hugging Face)
+- Ray Serve (Distributed)
 
 ## 📝 Weekly Deliverables
 
@@ -220,7 +330,7 @@ Compare:
 
 ### Additional Dependencies
 ```bash
-# Install FlashAttention
+# Install FlashAttention-2
 pip install flash-attn --no-build-isolation
 
 # Install Triton for custom kernels
@@ -231,13 +341,19 @@ pip install pyinstrument line_profiler
 
 # Install vLLM for comparison
 pip install vllm
+
+# Install xFormers for attention variants
+pip install xformers
+
+# Install PyTorch with CUDA 12.1
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
 
 ### Hardware Requirements
 This week requires GPU acceleration:
-- **Minimum**: NVIDIA GPU with 8GB VRAM
-- **Recommended**: NVIDIA GPU with 16GB+ VRAM
-- **Cloud option**: Google Colab Pro+ or AWS p3.2xlarge
+- **Minimum**: NVIDIA GPU with 8GB VRAM (RTX 3070+)
+- **Recommended**: NVIDIA GPU with 16GB+ VRAM (RTX 4090, A100)
+- **Cloud option**: Google Colab Pro+, AWS p3.2xlarge, Lambda Labs
 
 ### Verification Script
 ```python
@@ -247,7 +363,7 @@ import flash_attn
 print(f"PyTorch version: {torch.__version__}")
 print(f"CUDA available: {torch.cuda.is_available()}")
 print(f"GPU: {torch.cuda.get_device_name(0)}")
-print(f"FlashAttention available: {hasattr(flash_attn, 'flash_attn_qkvpacked_func')}")
+print(f"FlashAttention-2 available: {hasattr(flash_attn, 'flash_attn_varlen_func')}")
 
 # Test basic operations
 x = torch.randn(2, 32, 512, device='cuda')
@@ -263,26 +379,34 @@ You've successfully completed Week 2 if you can:
 2. Explain the trade-offs of different attention optimizations
 3. Determine optimal batch sizes for given hardware constraints
 4. Profile and identify bottlenecks in transformer inference
+5. Apply modern optimization techniques (FlashAttention-2, GQA, PagedAttention)
 
 ## 📚 Additional Resources
 
 ### Videos
-1. [FlashAttention: Fast and Memory-Efficient Exact Attention](https://www.youtube.com/watch?v=GQjX5F2fNpQ)
+1. [FlashAttention-2: Faster Attention with Better Parallelism](https://www.youtube.com/watch?v=H6QcPkGc8bQ)
 2. [Optimizing Transformer Inference on GPUs](https://www.youtube.com/watch?v=MV2c6t6HZ8M)
 3. [vLLM: Efficient LLM Serving](https://www.youtube.com/watch?v=4CxXozqZQqo)
+4. [Grouped-Query Attention Explained](https://www.youtube.com/watch?v=8c8zJ3nN0x4)
 
 ### Tools
-1. [FlashAttention GitHub](https://github.com/Dao-AILab/flash-attention)
+1. [FlashAttention-2 GitHub](https://github.com/Dao-AILab/flash-attention)
 2. [vLLM GitHub](https://github.com/vllm-project/vllm)
 3. [Triton Language Tutorial](https://triton-lang.org/main/getting-started/tutorials/index.html)
+4. [xFormers GitHub](https://github.com/facebookresearch/xformers)
 
 ### Community
 1. [PyTorch Optimization Forum](https://discuss.pytorch.org/c/optimization/11)
 2. [NVIDIA Developer Forums](https://forums.developer.nvidia.com/)
 3. [MLSys Papers](https://mlsys.org/)
+4. [Hugging Face Forums](https://discuss.huggingface.co/)
 
 ---
 
-**Estimated Time Commitment:** 15-18 hours  
+**Estimated Time Commitment:** 15-20 hours  
 **Difficulty Level:** ⭐⭐⭐☆☆ (Intermediate optimization)  
 **Next Week:** Advanced Sampling & Decoding
+
+---
+*Last Updated: April 2026*  
+*Enhanced with modern reading material and graphics*
