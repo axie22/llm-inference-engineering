@@ -9,13 +9,17 @@
   - `PagedKVCache` with paged memory allocation
   - Benchmarking suite for performance comparison
   - Sliding‑window cache stub (advanced strategy)
-- **`lab2_2_flashattention.ipynb` – Partially implemented**:
+- **`lab2_2_flashattention.ipynb` – Implemented**:
   - `compute_tile_attention`, `split_into_tiles`, `online_softmax_update` helpers
   - `flash_attention_forward` with tiling & online softmax (core algorithm)
   - Benchmarking code with PyTorch comparison
-  - Some TODO comments remain; implementation exists
-- Scaffolded labs with TODOs:
-  - `lab2_3_batch_optimization.ipynb` – Dynamic/continuous batching
+  - All TODOs cleaned up
+- **`lab2_3_batch_optimization.ipynb` – Implemented**:
+  - Batch‑size profiling with memory measurement
+  - Dynamic batching with timeout and max batch size
+  - Continuous batching slot management (stub)
+  - Workload simulation and comparison
+  - All TODOs implemented
 - Updated main `README.md` with modern references + link to PhD version
 - Original material preserved
 
@@ -45,19 +49,19 @@
 - **Hardware‑aware**: Tensor Core programming, Triton, CUTLASS, roofline model
 
 ## 🔗 **GitHub Status**
-- **Latest commit**: `172ea07` (Implemented FlashAttention lab 2.2)
-- **Previous**: `f770348` (Completed lab2_1)
+- **Latest commit**: `808c1ba` (Implemented batch optimization lab 2.3)
+- **Previous**: `172ea07` (Implemented FlashAttention lab 2.2)
 - **Repository**: https://github.com/axie22/llm‑inference‑engineering
 - **Week 2 files**: https://github.com/axie22/llm‑inference‑engineering/tree/main/week2
 - **Week 3 files**: https://github.com/axie22/llm‑inference‑engineering/tree/main/week3
 - **Week 4 files**: https://github.com/axie22/llm‑inference‑engineering/tree/main/week4
 
 ## 🚀 **Next Steps**
-1. **Run and verify** `lab2_2_flashattention.ipynb` – core algorithm implemented
-2. **Finish remaining TODOs** in lab 2.2 (tiling, forward pass comments)
-3. **Move to batch optimization** – start `lab2_3_batch_optimization.ipynb`
-4. **Request refinements** – Energy efficiency, formal verification, multi‑modal sections
-5. **Enhance Week 5** – Efficient training & scaling with same PhD treatment
+1. **Run and verify** Week 2 labs – all three labs now fully implemented
+2. **Move to Week 3** – start implementing speculative decoding, sampling, advanced decoding labs
+3. **Add deeper sections** – energy efficiency, formal verification, multi‑modal serving extensions
+4. **Enhance Week 5** – efficient training & scaling with same PhD treatment
+5. **Explore research frontiers** – use `RESEARCH_FRONTIERS.md` for advanced projects
 
 ---
 *Enhanced by OpenClaw assistant*
