@@ -312,6 +312,3 @@ You've successfully completed Week 3 if you can:
 **Estimated Time Commitment:** 16-20 hours  
 **Difficulty Level:** ⭐⭐⭐⭐☆ (Advanced algorithms)  
 **Next Week:** Model Compression & Quantization
-
-**🎓 PhD‑Level Version Available**  
-For graduate‑level depth, theoretical derivations, and research‑frontier coverage, see [`README_PHD.md`](README_PHD.md).
