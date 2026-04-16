@@ -22,9 +22,9 @@ In autoregressive decoding, each new token attends to all previous tokens. Naive
 ### Standard KV cache
 For a single layer with $h$ attention heads, head dimension $d$, and sequence length $n$, the cache for one batch element stores:
 
-$$
+```math
 \text{memory} = 2 \times h \times n \times d \times \text{dtype\_size}
-$$
+```
 
 The factor 2 accounts for keys and values. For a typical 32‑layer model with 32 heads, $d = 128$, and $n = 2048$, this reaches ~2 GB per batch element—already too large for many‑batch serving.
 
@@ -38,9 +38,9 @@ Standard multi‑head attention (MHA) stores separate KV pairs per head, multipl
 
 The cache size becomes:
 
-$$
+```math
 \text{memory} = 2 \times g \times n \times d \times \text{dtype\_size}
-$$
+```
 
 where $g = 1$ for MQA, $g = h$ for MHA, and $1 < g < h$ for GQA. This trades a small quality drop for a $h/g$ memory reduction—often acceptable for inference.
 
@@ -57,9 +57,9 @@ FlashAttention reorders the computation to keep the attention matrix in fast SRA
 ### Tiling and online softmax
 Let $Q$, $K$, $V$ be split into tiles of size $B \times d$. For each $Q$ tile, we iterate over $K$ tiles, computing:
 
-$$
+```math
 S_{ij} = Q_i K_j^\top / \sqrt{d} \qquad\text{(tile‑tile scores)}
-$$
+```
 
 We cannot compute softmax over the full row yet because we haven’t seen all $K$ tiles. Instead we maintain three running statistics per row:
 
@@ -69,14 +69,14 @@ We cannot compute softmax over the full row yet because we haven’t seen all $K
 
 When a new tile arrives, we update:
 
-$$
+```math
 \begin{aligned}
 m_{\text{new}} &= \max(m, \max(S_{ij})) \\
 \text{scale} &= \exp(m - m_{\text{new}}) \\
 l_{\text{new}} &= \text{scale} \times l + \sum \exp(S_{ij} - m_{\text{new}}) \\
 o_{\text{new}} &= \text{scale} \times o + \exp(S_{ij} - m_{\text{new}}) \, V_j
 \end{aligned}
-$$
+```
 
 After processing all $K$ tiles, the output for row $i$ is $o_i / l_i$.
 
@@ -93,12 +93,12 @@ Processing a batch of $b$ requests together amortizes the cost of loading weight
 
 We can model this as:
 
-$$
+```math
 \begin{aligned}
 \text{throughput}(b) &= \frac{b \times \text{tokens\_per\_request}}{\text{latency}(b)} \\
 \text{latency}(b) &= t_{\text{fixed}} + t_{\text{variable}} \times b
 \end{aligned}
-$$
+```
 
 The optimal batch size $b^*$ maximizes throughput while keeping latency under a service‑level objective (SLO). Finding $b^*$ requires profiling the actual model on the target hardware.
 
