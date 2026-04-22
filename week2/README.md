@@ -116,7 +116,18 @@ In traditional dynamic batching, the whole sequence is processed as a batch; if 
 This increases GPU utilization to >90 % for workloads with variable‑length sequences, but requires more sophisticated book‑keeping and kernel support.
 
 ### Finding the optimal batch size
-The roofline model gives an upper bound: throughput ≤ min(compute_roof, memory_roof). Compute roof is $\text{peak\_FLOPs} / \text{FLOPs\_per\_token}$. Memory roof is $\text{memory\_bandwidth} / \text{bytes\_per\_token}$. The actual throughput curve saturates when either roof is hit.
+The roofline model gives an upper bound: throughput ≤ min(compute_roof, memory_roof). Compute roof is: 
+```math 
+\text{peak\_FLOPs} / \text{FLOPs\_per\_token}
+```
+
+Memory roof is 
+
+```math
+\text{memory\_bandwidth} / \text{bytes\_per\_token}
+```
+
+The actual throughput curve saturates when either roof is hit.
 
 Profiling across batch sizes (as done in `lab2_3`) shows the knee of the curve—the point where adding another request yields diminishing returns.
 
